@@ -1,0 +1,385 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anim Studio — Frantz DevTool Suite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+--bg:#282a36;--bg2:#21222c;--surface:#44475a;--surface2:#383a4a;
+--text:#f8f8f2;--text2:#bd93f9;--muted:#6272a4;
+--accent:#bd93f9;--accent2:#ff79c6;--green:#50fa7b;--orange:#ffb86c;
+--red:#ff5555;--cyan:#8be9fd;--gold:#f1fa8c;
+--border:#44475a;--radius:10px;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:var(--surface);border-radius:3px}
+.top-nav{position:fixed;top:0;left:0;right:0;z-index:100;height:44px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 14px;justify-content:space-between}
+.top-nav .brand{font-weight:700;font-size:.8rem;display:flex;align-items:center;gap:6px}
+.top-nav .brand span{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.top-nav .links{display:flex;gap:3px;align-items:center}
+.top-nav .links a{padding:4px 7px;border-radius:5px;font-size:.6rem;color:var(--muted);text-decoration:none}
+.top-nav .links a:hover{color:var(--text);background:var(--surface)}
+.top-nav .tier-badge{padding:2px 9px;border-radius:10px;font-size:.55rem;font-weight:600;background:#50fa7b20;color:var(--green);cursor:pointer}
+.main{padding-top:44px;max-width:960px;margin:0 auto;padding-left:12px;padding-right:12px}
+.hero{text-align:center;padding:20px 0 10px}
+.hero h1{font-size:1.3rem;margin-bottom:2px}
+.hero p{color:var(--muted);font-size:.72rem}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:10px}
+.card-title{font-weight:600;font-size:.78rem;color:var(--text2);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.split-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+
+/* Controls */
+.control-group{margin-bottom:6px}
+.control-group label{display:block;font-size:.6rem;color:var(--muted);margin-bottom:2px;font-weight:500}
+.control-group input,.control-group select,.control-group textarea{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:5px 8px;border-radius:5px;font-size:.7rem;outline:none;transition:border-color .2s}
+.control-group input:focus,.control-group select:focus,.control-group textarea:focus{border-color:var(--accent)}
+.control-group textarea{font-family:var(--mono);font-size:.65rem;min-height:50px;resize:vertical}
+.control-group input[type="color"]{height:34px;padding:2px;cursor:pointer}
+.control-group input[type="range"]{padding:0;height:4px;accent-color:var(--accent);background:var(--surface);border:none;cursor:pointer}
+
+/* Stage */
+.stage{background:var(--bg);border:2px solid var(--border);border-radius:var(--radius);min-height:220px;display:flex;align-items:center;justify-content:center;padding:16px;position:relative;overflow:hidden;margin-bottom:8px}
+.stage canvas{max-width:100%;max-height:200px;border-radius:6px}
+
+/* Tabs */
+.tab-bar{display:flex;border-bottom:1px solid var(--border);margin-bottom:8px}
+.tab-btn{padding:5px 12px;font-size:.65rem;cursor:pointer;border:none;background:none;color:var(--muted);border-bottom:2px solid transparent}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+
+.preset-grid{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
+.preset-btn{padding:3px 9px;border-radius:5px;font-size:.6rem;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer}
+.preset-btn:hover{border-color:var(--accent)}
+.preset-btn.active{border-color:var(--accent);background:var(--surface2)}
+
+.color-row{display:flex;gap:6px;align-items:center}
+.color-row input[type="color"]{width:30px;height:30px}
+
+.btn{padding:5px 12px;border-radius:6px;border:none;font-size:.65rem;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--bg)}.btn-primary:hover{opacity:.85}
+.btn-secondary{background:var(--surface);color:var(--text);border:1px solid var(--border)}.btn-secondary:hover{border-color:var(--accent)}
+.btn-sm{padding:3px 8px;font-size:.6rem}
+.action-bar{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0;align-items:center}
+.action-bar .right{margin-left:auto;display:flex;gap:4px}
+
+.anim-options{display:flex;flex-wrap:wrap;gap:8px;font-size:.65rem;color:var(--muted);align-items:center}
+.anim-options label{display:flex;align-items:center;gap:3px;cursor:pointer}
+.anim-options input[type="checkbox"]{accent-color:var(--accent)}
+
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);padding:8px 16px;background:var(--surface);border:1px solid var(--accent);border-radius:var(--radius);font-size:.7rem;z-index:200;display:none;box-shadow:0 4px 20px rgba(0,0,0,.4)}
+footer{text-align:center;padding:20px 12px;font-size:.65rem;color:var(--muted);border-top:1px solid var(--border);margin-top:24px}
+footer a{color:var(--accent);text-decoration:none}
+
+@media(max-width:600px){.split,.split-3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav class="top-nav">
+<div class="brand">✨ <span>DevTools</span> <span style="font-weight:400;color:var(--muted);font-size:.6rem">/ Anim Studio</span></div>
+<div class="links">
+<span class="tier-badge" id="tBadge" onclick="cycleTier()">🆓 Free</span>
+<a href="https://frantzenterprise.github.io/devtool-suite/">Suite</a>
+<a href="https://frantzenterprise.github.io/ai-model-compare/">MC</a>
+<a href="https://frantzenterprise.github.io/devtool-palettestudio/">Palette</a>
+<a href="https://frantzenterprise.github.io/devtool-jsoncsv/">CSV</a>
+</div>
+</nav>
+
+<div class="main">
+<div class="hero">
+<h1>✨ Anim Studio</h1>
+<p>Create CSS text animations and canvas image effects. No libraries, no servers — all in your browser.</p>
+</div>
+
+<div class="tab-bar">
+<button class="tab-btn active" onclick="switchTab('text')">📝 Text</button>
+<button class="tab-btn" onclick="switchTab('image')">🖼️ Image</button>
+<button class="tab-btn" onclick="switchTab('export')">📤 Export</button>
+</div>
+
+<!-- TEXT TAB -->
+<div class="tab-panel active" id="tab-text">
+<div class="split">
+<div class="card" style="margin:0">
+<div class="card-title">🎬 Controls</div>
+<div class="preset-grid" id="textPresets"></div>
+<div class="control-group"><label>Text</label><input type="text" id="animText" value="Hello World" oninput="renderText()"></div>
+<div class="control-group"><label>Animation</label>
+<select id="animType" onchange="renderText()">
+<option value="fade">Fade In</option>
+<option value="slide">Slide Up</option>
+<option value="bounce">Bounce</option>
+<option value="pulse">Pulse</option>
+<option value="glitch">Glitch</option>
+<option value="rainbow">Rainbow</option>
+<option value="typewriter">Typewriter</option>
+<option value="shake">Shake</option>
+<option value="flip">Flip</option>
+<option value="gradient">Gradient Sweep</option>
+<option value="rotate3d">3D Rotate</option>
+<option value="wave">Wave</option>
+</select></div>
+<div class="split" style="gap:8px;margin-bottom:0">
+<div class="control-group"><label>Duration (s)</label><input type="number" id="animDuration" value="2" min="0.3" max="10" step="0.1" oninput="renderText()"></div>
+<div class="control-group"><label>Font Size</label><select id="animFontSize" onchange="renderText()"><option value="1.5rem">Small</option><option value="2.5rem" selected>Medium</option><option value="3.5rem">Large</option><option value="5rem">XL</option></select></div>
+</div>
+<div class="control-group"><label>Color</label>
+<div class="color-row"><input type="color" id="animColor" value="#bd93f9" onchange="renderText()"><input type="color" id="animColor2" value="#ff79c6" onchange="renderText()"></div></div>
+<div class="anim-options">
+<label><input type="checkbox" id="animBold" onchange="renderText()"> Bold</label>
+<label><input type="checkbox" id="animLoop" checked onchange="renderText()"> Loop</label>
+<label><input type="checkbox" id="animShadow" checked onchange="renderText()"> Glow</label>
+</div>
+</div>
+<div class="card" style="margin:0">
+<div class="card-title">👁️ Preview</div>
+<div class="stage" id="textStage"><div id="textPreview" style="text-align:center;font-size:2.5rem;font-weight:700;color:var(--accent)">Hello World</div></div>
+</div>
+</div>
+</div>
+
+<!-- IMAGE TAB -->
+<div class="tab-panel" id="tab-image">
+<div class="split">
+<div class="card" style="margin:0">
+<div class="card-title">🎬 Controls</div>
+<div class="preset-grid" id="imgPresets"></div>
+<div class="control-group"><label>Effect</label>
+<select id="imgEffect" onchange="renderImage()">
+<option value="grayscale">Grayscale</option>
+<option value="sepia">Sepia</option>
+<option value="invert">Invert</option>
+<option value="blur">Blur</option>
+<option value="vintage">Vintage</option>
+<option value="neon">Neon Glow</option>
+<option value="pixelate">Pixelate</option>
+<option value="ripple">Ripple</option>
+</select></div>
+<div class="control-group"><label>Intensity (0-100)</label><input type="range" id="imgIntensity" min="0" max="100" value="80" oninput="document.getElementById('intVal').textContent=this.value;renderImage()"><span id="intVal" style="font-size:.6rem;color:var(--muted)">80</span></div>
+<div class="control-group"><label>Load Image</label>
+<div style="display:flex;gap:6px">
+<input type="file" accept="image/*" id="imgUpload" onchange="loadImageFile(event)" style="font-size:.6rem;color:var(--muted)">
+<button class="btn btn-secondary btn-sm" onclick="loadDefaultImage()">🔁 Reset</button>
+</div></div>
+<div style="font-size:.6rem;color:var(--muted);margin-top:4px">Or paste a URL: <input type="text" id="imgUrl" placeholder="https://..." style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:3px 6px;border-radius:4px;font-size:.6rem;margin-top:2px" onchange="loadImageFromUrl(this.value)"></div>
+</div>
+<div class="card" style="margin:0">
+<div class="card-title">👁️ Preview</div>
+<div class="stage" id="imgStage"><canvas id="imgCanvas" width="400" height="240"></canvas></div>
+</div>
+</div>
+</div>
+
+<!-- EXPORT TAB -->
+<div class="tab-panel" id="tab-export">
+<div class="card">
+<div class="card-title">📤 Export Options</div>
+<div style="text-align:center;padding:16px">
+<button class="btn btn-primary" onclick="exportGIF()">🎞️ Export as GIF</button>
+<button class="btn btn-secondary" onclick="exportCSS()" style="margin-left:6px">📋 Copy CSS</button>
+<button class="btn btn-secondary" onclick="exportImage()" style="margin-left:6px">🖼️ Download Image</button>
+</div>
+<div style="margin-top:12px">
+<div class="control-group"><label>Generated CSS</label>
+<textarea id="exportCSSArea" rows="6" readonly style="font-size:.6rem">/* CSS will appear here */</textarea></div>
+</div>
+</div>
+</div>
+</div>
+
+<footer>
+<a href="https://frantzenterprise.github.io/devtool-suite/">DevTool Suite</a> · Anim Studio · ⚡ Powered by Frantz Enterprise
+</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+const state={tier:'free'}
+const TEXT_PRESETS=[
+{name:'Welcome',text:'Welcome to the Future'},{name:'Error',text:'Something Went Wrong'},
+{name:'Loading',text:'Loading...'},{name:'Success',text:'All Systems Go'},
+{name:'Dracula',text:'🧛 Dracula Theme'}
+]
+const IMG_PRESETS=[
+{name:'Dracula Logo',url:'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Crect width=\'100\' height=\'100\' fill=\'%23282a36\'/%3E%3Ctext x=\'50\' y=\'55\' text-anchor=\'middle\' font-family=\'monospace\' font-size=\'18\' fill=\'%23bd93f9\'%3EDEV%3C/text%3E%3C/svg%3E'},
+{name:'Gradient',url:'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Cdefs%3E%3ClinearGradient id=\'g\' x1=\'0%25\' y1=\'0%25\' x2=\'100%25\' y2=\'100%25\'%3E%3Cstop offset=\'0%25\' stop-color=\'%23bd93f9\'/%3E%3Cstop offset=\'100%25\' stop-color=\'%23ff79c6\'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width=\'100\' height=\'100\' fill=\'url(%23g)\'/%3E%3C/svg%3E'}
+]
+
+let sourceImage=null
+
+function init(){
+document.getElementById('textPresets').innerHTML=TEXT_PRESETS.map(p=>`<button class="preset-btn" onclick="document.getElementById('animText').value='${p.text.replace(/'/g,"\\'")}';renderText();showToast('📄 '+p.name)">${p.name}</button>`).join('')
+document.getElementById('imgPresets').innerHTML=IMG_PRESETS.map(p=>`<button class="preset-btn" onclick="loadImageFromUrl('${p.url}');showToast('📄 '+p.name)">${p.name}</button>`).join('')
+renderText()
+loadDefaultImage()
+}
+
+function renderText(){
+const text=document.getElementById('animText').value||'Hello'
+const type=document.getElementById('animType').value
+const dur=document.getElementById('animDuration').value
+const size=document.getElementById('animFontSize').value
+const c1=document.getElementById('animColor').value
+const c2=document.getElementById('animColor2').value
+const bold=document.getElementById('animBold').checked?'bold':'600'
+const loop=document.getElementById('animLoop').checked?'infinite':'1'
+const shadow=document.getElementById('animShadow').checked
+
+const el=document.getElementById('textPreview')
+el.textContent=text
+el.style.fontSize=size
+el.style.fontWeight=bold
+el.style.position='relative'
+
+// Build animation CSS
+let css=''
+const base='@keyframes animStudio{'
+const end='}'
+
+switch(type){
+case 'fade':css=base+'from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}'+end;el.style.color=c1;break
+case 'slide':css=base+'from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}'+end;el.style.color=c1;break
+case 'bounce':css=base+'0%{transform:translateY(0)}25%{transform:translateY(-20px)}50%{transform:translateY(0)}75%{transform:translateY(-10px)}100%{transform:translateY(0)}'+end;el.style.color=c1;break
+case 'pulse':css=base+'0%{transform:scale(1)}50%{transform:scale(1.1)}100%{transform:scale(1)}'+end;el.style.color=c1;break
+case 'glitch':css=base+'0%{transform:translate(0)}20%{transform:translate(-3px,2px)}40%{transform:translate(3px,-1px)}60%{transform:translate(-2px,-2px)}80%{transform:translate(2px,1px)}100%{transform:translate(0)}'+end;el.style.color=c1;break
+case 'rainbow':css=base+'0%{color:'+c1+'}25%{color:'+c2+'}50%{color:'+c1+'}75%{color:'+c2+'}100%{color:'+c1+'}'+end;el.style.color=c1;break
+case 'typewriter':css=base+'from{width:0}to{width:100%}'+end;el.style.overflow='hidden';el.style.whiteSpace='nowrap';el.style.borderRight='3px solid '+c1;el.style.color=c1;break
+case 'shake':css=base+'0%{transform:translateX(0)}10%{transform:translateX(-8px)}20%{transform:translateX(8px)}30%{transform:translateX(-6px)}40%{transform:translateX(6px)}50%{transform:translateX(-4px)}60%{transform:translateX(4px)}70%{transform:translateX(-2px)}80%{transform:translateX(2px)}100%{transform:translateX(0)}'+end;el.style.color=c1;break
+case 'flip':css=base+'0%{transform:perspective(400px) rotateY(0)}100%{transform:perspective(400px) rotateY(360deg)}'+end;el.style.color=c1;break
+case 'gradient':
+css=base+'0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}'+end
+el.style.background='linear-gradient(270deg,'+c1+','+c2+','+c1+')'
+el.style.backgroundSize='200% 100%'
+el.style.webkitBackgroundClip='text'
+el.style.webkitTextFillColor='transparent'
+break
+case 'rotate3d':css=base+'0%{transform:perspective(500px) rotateX(0)}100%{transform:perspective(500px) rotateX(360deg)}'+end;el.style.color=c1;break
+case 'wave':css=base+'0%{transform:translateY(0)}25%{transform:translateY(-10px)}50%{transform:translateY(0)}75%{transform:translateY(-10px)}100%{transform:translateY(0)}'+end;el.style.color=c1;break
+}
+
+if(type!=='gradient'){
+el.style.background='none'
+el.style.webkitBackgroundClip='unset'
+el.style.webkitTextFillColor='unset'
+}
+
+// Inject keyframes
+let styleEl=document.getElementById('animStyle')
+if(!styleEl){styleEl=document.createElement('style');styleEl.id='animStyle';document.head.appendChild(styleEl)}
+styleEl.textContent=css
+
+el.style.animation='animStudio '+dur+'s ease '+loop
+if(type==='typewriter')el.style.animation='animStudio '+(text.length*0.08)+'s steps('+text.length+') '+loop+', blink 0.7s step-end '+loop
+
+if(shadow&&type!=='gradient'){el.style.textShadow='0 0 10px '+c1+'33,0 0 30px '+c1+'1a'}
+else if(!shadow)el.style.textShadow='none'
+
+// Update export CSS
+document.getElementById('exportCSSArea').value=`/* Animation: ${type} */\n${css}\n\n.element {\n  animation: animStudio ${dur}s ease ${loop};\n  color: ${c1};\n  font-size: ${size};\n  font-weight: ${bold};\n}`
+}
+
+function loadDefaultImage(){
+const c=document.getElementById('imgCanvas')
+const ctx=c.getContext('2d')
+const w=c.width,h=c.height
+ctx.fillStyle='#282a36';ctx.fillRect(0,0,w,h)
+ctx.fillStyle='#bd93f9';ctx.font='bold 32px Inter,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('⚡ DEV',w/2,h/2)
+ctx.fillStyle='#6272a4';ctx.font='14px Inter,sans-serif';ctx.fillText('Drop an image above',w/2,h/2+40)
+sourceImage=ctx.getImageData(0,0,w,h)
+renderImage()
+}
+
+function loadImageFile(e){
+const file=e.target.files[0]
+if(!file)return
+const reader=new FileReader()
+reader.onload=function(ev){
+const img=new Image()
+img.onload=function(){
+const c=document.getElementById('imgCanvas')
+const ctx=c.getContext('2d')
+ctx.drawImage(img,0,0,c.width,c.height)
+sourceImage=ctx.getImageData(0,0,c.width,c.height)
+renderImage()
+}
+img.src=ev.target.result
+}
+reader.readAsDataURL(file)
+}
+
+function loadImageFromUrl(url){
+const img=new Image()
+img.crossOrigin='Anonymous'
+img.onload=function(){
+const c=document.getElementById('imgCanvas')
+const ctx=c.getContext('2d')
+ctx.clearRect(0,0,c.width,c.height)
+ctx.drawImage(img,0,0,c.width,c.height)
+sourceImage=ctx.getImageData(0,0,c.width,c.height)
+renderImage()
+}
+img.onerror=function(){showToast('❌ Failed to load image')}
+img.src=url
+}
+
+function renderImage(){
+if(!sourceImage)return
+const c=document.getElementById('imgCanvas')
+const ctx=c.getContext('2d')
+const effect=document.getElementById('imgEffect').value
+const intensity=parseInt(document.getElementById('imgIntensity').value)/100
+
+ctx.putImageData(sourceImage,0,0)
+const imgData=ctx.getImageData(0,0,c.width,c.height)
+const d=imgData.data
+
+switch(effect){
+case'grayscale':for(let i=0;i<d.length;i+=4){const g=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];const t=intensity;d[i]=d[i]*(1-t)+g*t;d[i+1]=d[i+1]*(1-t)+g*t;d[i+2]=d[i+2]*(1-t)+g*t}break
+case'sepia':for(let i=0;i<d.length;i+=4){const r=d[i],g=d[i+1],b=d[i+2];const t=intensity;d[i]=r*(1-t)+(r*0.393+g*0.769+b*0.189)*t;d[i+1]=g*(1-t)+(r*0.349+g*0.686+b*0.168)*t;d[i+2]=b*(1-t)+(r*0.272+g*0.534+b*0.131)*t}break
+case'invert':for(let i=0;i<d.length;i+=4){d[i]=255-d[i];d[i+1]=255-d[i+1];d[i+2]=255-d[i+2]}break
+case'blur':const r=Math.round(intensity*5);for(let i=0;i<d.length;i+=4){let rs=0,gs=0,bs=0,cnt=0;for(let dx=-r;dx<=r;dx++)for(let dy=-r;dy<=r;dy++){const px=(Math.floor(i/4)+dx+dy*c.width)*4;if(px>=0&&px<d.length){rs+=d[px];gs+=d[px+1];bs+=d[px+2];cnt++}}if(cnt){d[i]=rs/cnt;d[i+1]=gs/cnt;d[i+2]=bs/cnt}}break
+case'vintage':for(let i=0;i<d.length;i+=4){const t=intensity;d[i]=Math.min(255,d[i]*(1-t)+d[i]*0.85+20*t);d[i+1]=Math.min(255,d[i+1]*(1-t)+d[i+1]*0.8+10*t);d[i+2]=Math.min(255,d[i+2]*(1-t)+d[i+2]*0.75-10*t)}break
+case'neon':for(let i=0;i<d.length;i+=4){const bright=Math.max(d[i],d[i+1],d[i+2]);if(bright>100){d[i]=Math.min(255,d[i]*1.5+50*intensity);d[i+1]=Math.min(255,d[i+1]*0.3);d[i+2]=Math.min(255,d[i+2]*1.5+50*intensity)}}break
+case'pixelate':const ps=Math.max(2,Math.round(4+intensity*12));for(let y=0;y<c.height;y+=ps){for(let x=0;x<c.width;x+=ps){const idx=(y*c.width+x)*4;ctx.fillStyle=`rgba(${d[idx]},${d[idx+1]},${d[idx+2]},255)`;ctx.fillRect(x,y,ps,ps)}}ctx.putImageData(imgData,0,0);return
+case'ripple':for(let y=0;y<c.height;y++){for(let x=0;x<c.width;x++){const dx=Math.sin(y*0.05+Date.now()*0.002)*intensity*8;const sx=Math.min(c.width-1,Math.max(0,x+dx));const idx=(Math.round(y)*c.width+Math.round(sx))*4;const oidx=(y*c.width+x)*4;d[oidx]=d[idx];d[oidx+1]=d[idx+1];d[oidx+2]=d[idx+2]}}break
+}
+ctx.putImageData(imgData,0,0)
+}
+
+function switchTab(n){
+document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.textContent.toLowerCase().includes(n)))
+document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active',p.id==='tab-'+n))
+if(n==='image')renderImage()
+}
+
+function exportCSS(){
+const val=document.getElementById('exportCSSArea').value
+navigator.clipboard.writeText(val).then(()=>showToast('📋 CSS copied!')).catch(()=>showToast('📋 Ready'))
+}
+
+function exportImage(){
+const c=document.getElementById('imgCanvas')
+const a=document.createElement('a');a.href=c.toDataURL('image/png');a.download='anim-effect.png';a.click()
+showToast('🖼️ Image downloaded')
+}
+
+function exportGIF(){
+const c=document.getElementById('imgCanvas')
+const a=document.createElement('a');a.href=c.toDataURL('image/png');a.download='anim-frame.png';a.click()
+showToast('🎞️ Frame captured (GIF export requires backend)')
+}
+
+function cycleTier(){
+const t=['free','pro','team'];const c=t.indexOf(state.tier);state.tier=t[(c+1)%t.length]
+const b=document.getElementById('tBadge')
+if(state.tier==='free'){b.textContent='🆓 Free';b.style.background='#50fa7b20';b.style.color='#50fa7b';showToast('🆓 Free mode')}
+else if(state.tier==='pro'){b.textContent='⚡ Pro';b.style.background='#ff79c620';b.style.color='#ff79c6';showToast('⚡ Pro activated')}
+else{b.textContent='🏢 Team';b.style.background='#ffb86c20';b.style.color='#ffb86c';showToast('🏢 Team activated')}
+}
+
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',2000)}
+document.addEventListener('DOMContentLoaded',init)
+</script>
+</body>
+</html>
